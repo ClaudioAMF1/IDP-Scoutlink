@@ -1,0 +1,79 @@
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--scout-navy);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 2px 0 12px rgba(0,65,118,0.2);
+}
+
+/* Logo */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  background: var(--scout-navy-dark);
+}
+.sidebar-logo-icon { font-size: 28px; line-height: 1; }
+.sidebar-logo-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px; font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+.sidebar-logo-sub { font-size: 10px; color: rgba(255,255,255,0.55); font-weight: 500; line-height: 1.4; }
+
+/* Nav */
+.sidebar-nav { flex: 1; padding: 16px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.sidebar-nav-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: rgba(255,255,255,0.4);
+  padding: 0 10px; margin-bottom: 8px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.sidebar-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 8px;
+  font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.7);
+  transition: var(--transition); border: none; background: transparent;
+  width: 100%; text-align: left; cursor: pointer;
+  position: relative;
+}
+.sidebar-nav-item:hover {
+  color: #ffffff;
+  background: rgba(255,255,255,0.1);
+}
+.sidebar-nav-item.active {
+  color: #ffffff;
+  background: var(--scout-orange);
+  font-weight: 700;
+}
+.sidebar-nav-item.active .nav-badge {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+  border-color: rgba(255,255,255,0.3);
+}
+
+.nav-icon { font-size: 18px; line-height: 1; min-width: 22px; }
+.nav-label { flex: 1; font-family: 'Open Sans', sans-serif; }
+.nav-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+  background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.2);
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Bottom */
+.sidebar-bottom { padding: 12px; border-top: 1px solid rgba(255,255,255,0.12); }
+.sidebar-divider { height: 1px; background: rgba(255,255,255,0.1); margin-bottom: 8px; }
+.sidebar-logout { color: rgba(255,255,255,0.55); }
+.sidebar-logout:hover { color: #fff; background: rgba(241,90,36,0.3); }
+
+/* Scrollbar in sidebar */
+.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
