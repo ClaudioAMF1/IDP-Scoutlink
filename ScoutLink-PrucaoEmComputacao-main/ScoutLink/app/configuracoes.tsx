@@ -1,17 +1,57 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Switch, ScrollView,
+  Alert, Linking, Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScoutColors, Spacing, Radius, Typography } from '@/constants/theme';
+import {
+  getNotificationsEnabled,
+  setNotificationsEnabled,
+  showLocalTestNotification,
+} from '@/services/notifications';
 
 export default function SettingsScreen() {
   const router = useRouter();
 
   // Settings states
-  const [notifications, setNotifications] = useState(true);
+  const [notifications, setNotifications] = useState(false);
   const [darkTheme, setDarkTheme] = useState(false);
   const [locationEnabled, setLocationEnabled] = useState(true);
+
+  useEffect(() => {
+    getNotificationsEnabled().then(setNotifications).catch(() => {});
+  }, []);
+
+  const onToggleNotifications = async (value: boolean) => {
+    const granted = await setNotificationsEnabled(value);
+    setNotifications(granted);
+
+    if (value && !granted) {
+      Alert.alert(
+        'Permissão necessária',
+        'Para receber notificações pop-up, habilite-as nas configurações do sistema.',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Abrir configurações',
+            onPress: () => {
+              if (Platform.OS === 'ios') Linking.openURL('app-settings:');
+              else Linking.openSettings();
+            },
+          },
+        ],
+      );
+      return;
+    }
+
+    if (granted) {
+      await showLocalTestNotification(
+        'Notificações habilitadas',
+        'Você receberá avisos sobre eventos e chamados.',
+      );
+    }
+  };
 
   const SectionTitle = ({ title }: { title: string }) => (
     <Text style={styles.sectionTitle}>{title}</Text>
@@ -39,7 +79,7 @@ export default function SettingsScreen() {
             </View>
             <Switch
               value={notifications}
-              onValueChange={setNotifications}
+              onValueChange={onToggleNotifications}
               trackColor={{ false: ScoutColors.borderLight, true: ScoutColors.orange }}
               thumbColor="#fff"
             />
