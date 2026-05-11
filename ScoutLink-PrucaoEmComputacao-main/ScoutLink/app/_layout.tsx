@@ -1,8 +1,12 @@
+import { useEffect } from 'react';
 import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { ScoutColors } from '@/constants/theme';
+import { configureNotificationHandler, ensureAndroidChannel } from '@/services/notifications';
+
+configureNotificationHandler();
 
 const ScoutTheme = {
   ...DarkTheme,
@@ -21,6 +25,10 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  useEffect(() => {
+    ensureAndroidChannel();
+  }, []);
+
   return (
     <ThemeProvider value={ScoutTheme}>
       <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
