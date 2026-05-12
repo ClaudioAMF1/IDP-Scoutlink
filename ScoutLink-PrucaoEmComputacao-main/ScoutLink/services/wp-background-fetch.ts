@@ -13,8 +13,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 
 import { fetchNewWordPressPosts, NoticiaItem } from './wordpress';
+
+const IS_EXPO_GO = Constants.appOwnership === 'expo';
 
 const TASK_NAME = 'WP_NEWS_BACKGROUND_FETCH';
 const LAST_SEEN_KEY = 'scoutlink:wp:last_seen_date';
@@ -78,6 +81,10 @@ async function _dispararNotificacao(post: NoticiaItem): Promise<void> {
 
 /** Registra a tarefa de background. Chamar uma vez no _layout.tsx. */
 export async function registerWpBackgroundFetch(): Promise<void> {
+  if (IS_EXPO_GO) {
+    console.log('[WP BG Fetch] Pulado em Expo Go (requer dev build).');
+    return;
+  }
   try {
     const status = await BackgroundFetch.getStatusAsync();
     if (
