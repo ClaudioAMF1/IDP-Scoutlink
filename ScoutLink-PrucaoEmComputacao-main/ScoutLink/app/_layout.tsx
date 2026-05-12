@@ -1,11 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { DarkTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import * as Notifications from 'expo-notifications';
 import 'react-native-reanimated';
-import { ScoutColors } from '@/constants/theme';
-import { configureNotificationHandler, ensureAndroidChannel } from '@/services/notifications';
 
+import { ScoutColors } from '@/constants/theme';
+import { configureNotificationHandler, ensureAndroidChannel, requestPermissions } from '@/services/notifications';
+import { registerWpBackgroundFetch, checkNowForNewPosts } from '@/services/wp-background-fetch';
+
+// Configura como as notificações aparecem com o app aberto
 configureNotificationHandler();
 
 const ScoutTheme = {
@@ -25,8 +30,48 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  const router = useRouter();
+  const notifListener = useRef<Notifications.EventSubscription | null>(null);
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+
   useEffect(() => {
-    ensureAndroidChannel();
+    async function setup() {
+      // 1. Canal Android (sem isso notificações não aparecem no Android 8+)
+      await ensureAndroidChannel();
+
+      // 2. Pede permissão de notificação ao usuário
+      const granted = await requestPermissions();
+      if (!granted) return;
+
+      // 3. Registra a tarefa de background fetch
+      await registerWpBackgroundFetch();
+
+      // 4. Verifica imediatamente ao abrir o app
+      checkNowForNewPosts();
+    }
+
+    setup();
+
+    // 5. Usuário toca na notificação → vai para o feed
+    notifListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as { tipo?: string };
+      if (data?.tipo === 'wp_noticia') {
+        router.replace('/(tabs)');
+      }
+    });
+
+    // 6. App volta ao foreground → verifica posts novos silenciosamente
+    const appStateSub = AppState.addEventListener('change', (nextState: AppStateStatus) => {
+      if (appStateRef.current.match(/inactive|background/) && nextState === 'active') {
+        checkNowForNewPosts();
+      }
+      appStateRef.current = nextState;
+    });
+
+    return () => {
+      notifListener.current?.remove();
+      appStateSub.remove();
+    };
   }, []);
 
   return (

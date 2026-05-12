@@ -26,11 +26,15 @@ def on_startup() -> None:
 def healthcheck() -> dict:
     return {"status": "ok", "env": settings.app_env}
 
+
 from app.api.routes import taaec, uels, chamados, malotes, notificacoes, perfis, admin
-app.include_router(taaec.router, prefix="/api/taaec", tags=["TAAEC"])
-app.include_router(uels.router, prefix="/api/uels", tags=["UELs"])
-app.include_router(perfis.router, prefix="/api/perfis", tags=["Perfis"])
-app.include_router(chamados.router, prefix="/api/chamados", tags=["Chamados"])
-app.include_router(malotes.router, prefix="/api/malotes", tags=["Malotes"])
-app.include_router(notificacoes.router, prefix="/api/notificacoes", tags=["Notificações"])
-app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
+from app.api.routes import wordpress_sync  # novo
+
+app.include_router(taaec.router,          prefix="/api/taaec",       tags=["TAAEC"])
+app.include_router(uels.router,           prefix="/api/uels",        tags=["UELs"])
+app.include_router(perfis.router,         prefix="/api/perfis",      tags=["Perfis"])
+app.include_router(chamados.router,       prefix="/api/chamados",    tags=["Chamados"])
+app.include_router(malotes.router,        prefix="/api/malotes",     tags=["Malotes"])
+app.include_router(notificacoes.router,   prefix="/api/notificacoes", tags=["Notificações"])
+app.include_router(admin.router,          prefix="/api/admin",       tags=["Admin"])
+app.include_router(wordpress_sync.router, prefix="/api/wordpress",   tags=["WordPress"])
